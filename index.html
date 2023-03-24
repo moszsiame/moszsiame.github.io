@@ -1,50 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+  <head>
+    <title>QR Code Generator</title>
+    <!-- Material UI stylesheets -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+    <!-- QRCode.js library -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 
-<body>
+    <!-- Material UI JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-    <p id="txt_agent">
-    </p>
-    <hr />
-    <p id="txt">
-
-    </p>
     <script>
-        //var deviceAgent = navigator.userAgent.toLocaleLowerCase();
-        //document.getElementById('txt_agent').innerText = deviceAgent;
-    </script>
-    <script language="javascript">
-        var deviceAgent = navigator.userAgent.toLowerCase();
-        var mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(deviceAgent));
-        if (mobile) {
-            //alert("MOBILE DEVICE DETECTED");
-            document.write("<b>----------------------------------------<br>")
-            document.write("<b>" + navigator.userAgent + "<br>")
-            document.write("<b>----------------------------------------<br>")
-            var userAgent = navigator.userAgent.toLowerCase();
-            if ((userAgent.search("android") > -1) && (userAgent.search("mobile") > -1)) {
-                document.write("<h1> ANDROID MOBILE </h1> <br>")
-            }
-            else if ((userAgent.search("android") > -1) && !(userAgent.search("mobile") > -1)) {
-                document.write("<h1> ANDROID TABLET </h1> <br>")
-            }
-            else if (userAgent.search("iphone") > -1) {
-                document.write("<h1> IOS MOBILE </h1> <br>")
-            }
-            else if (userAgent.search("ipad") > -1) {
-                document.write("<h1> IOS IPAD </h1> <br>")
-            }
+      // Function to generate QR code from input text
+      function generateQR() {
+        // Get input text value
+        var input = document.getElementById("input").value;
+        // Check if input has value
+        if (input === "") {
+          M.toast({ html: "Please enter text to encode!" });
+          return;
         }
-        else
-            alert("NO MOBILE DEVICE DETECTED");
-    </script>
-</body>
+        // Generate QR code
+        new QRCode(document.getElementById("qrcode"), input);
+      }
 
+      // Function to clear input and QR code
+      function clearQR() {
+        // Clear input value
+        document.getElementById("input").value = "";
+        // Clear QR code
+        document.getElementById("qrcode").innerHTML = "";
+      }
+    </script>
+
+    <!-- Material UI custom styles -->
+    <style>
+      .container {
+        padding-top: 50px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      #qrcode {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Material UI container -->
+    <div class="container">
+      <div class="card">
+        <h1>QR Code Generator</h1>
+        <div class="row">
+          <div class="input-field col s12">
+            <input type="text" id="input">
+            <label for="input">Enter text to encode:</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <button class="btn" onclick="generateQR()">Generate QR Code</button>
+            <button class="btn" onclick="clearQR()">Clear</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <div id="qrcode"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
