@@ -74,56 +74,83 @@
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
+        let deferredPrompt;
+    
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI notify the user they can install the PWA
+            document.getElementById('installBtn').style.display = 'block';
+    
+            document.getElementById('installBtn').addEventListener('click', (e) => {
+                // Hide the app provided install promotion
+                document.getElementById('installBtn').style.display = 'none';
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+    
         document.addEventListener("DOMContentLoaded", function() {
             loadSettings();
             M.AutoInit(); // โหลด Materialize Components
             var elems = document.querySelectorAll('.modal');
             M.Modal.init(elems);
         });
-        
+    
         function saveSettings() {
             const carName = document.getElementById("carName").value;
             const totalPayments = parseInt(document.getElementById("totalPayments").value) || 0;
             const paidPayments = parseInt(document.getElementById("paidPayments").value) || 0;
             const amountPerPayment = parseFloat(document.getElementById("amountPerPayment").value) || 0;
-            
+    
             document.cookie = `carName=${carName}; path=/`;
             document.cookie = `totalPayments=${totalPayments}; path=/`;
             document.cookie = `paidPayments=${paidPayments}; path=/`;
             document.cookie = `amountPerPayment=${amountPerPayment}; path=/`;
-            
+    
             loadSettings();
             var instance = M.Modal.getInstance(document.getElementById("settingsModal"));
             instance.close();
         }
-        
+    
         function loadSettings() {
             const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
                 const [key, value] = cookie.split('=');
                 acc[key] = value;
                 return acc;
             }, {});
-            
+    
             const carName = cookies.carName || "";
             const totalPayments = parseInt(cookies.totalPayments) || 0;
             const paidPayments = parseInt(cookies.paidPayments) || 0;
             const amountPerPayment = parseFloat(cookies.amountPerPayment) || 0;
-            
+    
             document.getElementById("carName").value = carName;
             document.getElementById("totalPayments").value = totalPayments;
             document.getElementById("paidPayments").value = paidPayments;
             document.getElementById("amountPerPayment").value = amountPerPayment;
-            
+    
             document.getElementById("carTitle").innerText = carName || "-";
             document.getElementById("remainingPayments").innerText = totalPayments - paidPayments;
             document.getElementById("totalAmount").innerText = totalPayments * amountPerPayment;
             document.getElementById("remainingAmount").innerText = (totalPayments - paidPayments) * amountPerPayment;
             document.getElementById("currentPayment").innerText = paidPayments;
             document.getElementById("totalPaymentsText").innerText = totalPayments;
-            
+    
             let progress = (paidPayments / totalPayments) * 100;
             document.getElementById("progressBar").style.width = progress + "%";
-            
+    
             M.updateTextFields();
         }
     </script>
