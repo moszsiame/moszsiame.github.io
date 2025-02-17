@@ -1,88 +1,131 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>QR Code Generator</title>
-    <!-- Material UI stylesheets -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
-    />
-
-    <!-- QRCode.js library -->
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-
-    <!-- Material UI JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
-    <script>
-      // Function to generate QR code from input text
-      function generateQR() {
-        // Get input text value
-        var input = document.getElementById("input").value;
-        // Check if input has value
-        if (input === "") {
-          M.toast({ html: "Please enter text to encode!" });
-          return;
-        }
-        // Generate QR code
-        new QRCode(document.getElementById("qrcode"), input);
-      }
-
-      // Function to clear input and QR code
-      function clearQR() {
-        // Clear input value
-        document.getElementById("input").value = "";
-        // Clear QR code
-        document.getElementById("qrcode").innerHTML = "";
-      }
-    </script>
-
-    <!-- Material UI custom styles -->
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตัวติดตามงวดรถยนต์</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
-      .container {
-        padding-top: 50px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      #qrcode {
-        margin-top: 20px;
-      }
-	  
-	  img {
-		padding-top: 10px;
-	  }
+        body {
+            padding: 20px;
+            font-family: "Noto Sans Thai Looped", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .progress-container {
+            margin-top: 20px;
+        }
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
     </style>
-  </head>
-  <body>
-    <!-- Material UI container -->
+</head>
+<body>
     <div class="container">
-      <div class="card">
-        <h1>QR Code Generator</h1>
-        <div class="row">
-          <div class="input-field col s12">
-            <input type="text" id="input">
-            <label for="input">Enter text to encode:</label>
-          </div>
+        <h4 class="center">ตัวติดตามงวดรถยนต์</h4>
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <h5>ตั้งค่าข้อมูล</h5>
+                <div class="input-field">
+                    <input type="text" id="carName">
+                    <label for="carName">ชื่อรถ</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" id="totalPayments">
+                    <label for="totalPayments">จำนวนงวดทั้งหมด</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" id="paidPayments">
+                    <label for="paidPayments">จำนวนงวดที่จ่ายแล้ว</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" id="amountPerPayment">
+                    <label for="amountPerPayment">จำนวนเงินต่องวด</label>
+                </div>
+                <button class="btn waves-effect waves-light" onclick="saveSettings()">บันทึก</button>
+            </div>
         </div>
-        <div class="row">
-          <div class="col s12">
-            <button class="btn" onclick="generateQR()">Generate QR Code</button>
-            <button class="btn" onclick="clearQR()">Clear</button>
-          </div>
+        <div id="summary" class="card-panel">
+            <h5 id="carTitle">-</h5>
+            <p>จำนวนงวดที่เหลือ: <span id="remainingPayments">-</span></p>
+            <p>ยอดเงินที่ต้องจ่ายทั้งหมด: <span id="totalAmount">-</span> บาท</p>
+            <p>ยอดเงินที่ต้องจ่ายคงเหลือ: <span id="remainingAmount">-</span> บาท</p>
+            <div class="progress-container">
+                <p>งวดผ่อนปัจจุบัน: <span id="currentPayment">-</span> / <span id="totalPaymentsText">-</span></p>
+                <div class="progress">
+                    <div id="progressBar" class="determinate" style="width: 0%"></div>
+                </div>
+            </div>
         </div>
-        <div class="row">
-          <div class="col s12">
-            <div id="qrcode"></div>
-          </div>
+        <button id="installBtn" class="btn waves-effect waves-light">ติดตั้งแอป</button>
+        <div class="fab-container">
+            <a class="btn-floating btn-large waves-effect waves-light red modal-trigger" href="#settingsModal">
+                <i class="material-icons">settings</i>
+            </a>
         </div>
-      </div>
     </div>
-  </body>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadSettings();
+            M.AutoInit(); // โหลด Materialize Components
+            var elems = document.querySelectorAll('.modal');
+            M.Modal.init(elems);
+        });
+        
+        function saveSettings() {
+            const carName = document.getElementById("carName").value;
+            const totalPayments = parseInt(document.getElementById("totalPayments").value) || 0;
+            const paidPayments = parseInt(document.getElementById("paidPayments").value) || 0;
+            const amountPerPayment = parseFloat(document.getElementById("amountPerPayment").value) || 0;
+            
+            document.cookie = `carName=${carName}; path=/`;
+            document.cookie = `totalPayments=${totalPayments}; path=/`;
+            document.cookie = `paidPayments=${paidPayments}; path=/`;
+            document.cookie = `amountPerPayment=${amountPerPayment}; path=/`;
+            
+            loadSettings();
+            var instance = M.Modal.getInstance(document.getElementById("settingsModal"));
+            instance.close();
+        }
+        
+        function loadSettings() {
+            const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
+                const [key, value] = cookie.split('=');
+                acc[key] = value;
+                return acc;
+            }, {});
+            
+            const carName = cookies.carName || "";
+            const totalPayments = parseInt(cookies.totalPayments) || 0;
+            const paidPayments = parseInt(cookies.paidPayments) || 0;
+            const amountPerPayment = parseFloat(cookies.amountPerPayment) || 0;
+            
+            document.getElementById("carName").value = carName;
+            document.getElementById("totalPayments").value = totalPayments;
+            document.getElementById("paidPayments").value = paidPayments;
+            document.getElementById("amountPerPayment").value = amountPerPayment;
+            
+            document.getElementById("carTitle").innerText = carName || "-";
+            document.getElementById("remainingPayments").innerText = totalPayments - paidPayments;
+            document.getElementById("totalAmount").innerText = totalPayments * amountPerPayment;
+            document.getElementById("remainingAmount").innerText = (totalPayments - paidPayments) * amountPerPayment;
+            document.getElementById("currentPayment").innerText = paidPayments;
+            document.getElementById("totalPaymentsText").innerText = totalPayments;
+            
+            let progress = (paidPayments / totalPayments) * 100;
+            document.getElementById("progressBar").style.width = progress + "%";
+            
+            M.updateTextFields();
+        }
+    </script>
+</body>
 </html>

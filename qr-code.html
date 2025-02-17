@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>QR Code Generator</title>
+    <!-- Material UI stylesheets -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+
+    <!-- QRCode.js library -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+    <!-- Material UI JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+      // Function to generate QR code from input text
+      function generateQR() {
+        // Get input text value
+        var input = document.getElementById("input").value;
+        // Check if input has value
+        if (input === "") {
+          M.toast({ html: "Please enter text to encode!" });
+          return;
+        }
+        // Generate QR code
+        new QRCode(document.getElementById("qrcode"), input);
+      }
+
+      // Function to clear input and QR code
+      function clearQR() {
+        // Clear input value
+        document.getElementById("input").value = "";
+        // Clear QR code
+        document.getElementById("qrcode").innerHTML = "";
+      }
+    </script>
+
+    <!-- Material UI custom styles -->
+    <style>
+      .container {
+        padding-top: 50px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      #qrcode {
+        margin-top: 20px;
+      }
+	  
+	  img {
+		padding-top: 10px;
+	  }
+    </style>
+  </head>
+  <body>
+    <!-- Material UI container -->
+    <div class="container">
+      <div class="card">
+        <h1>QR Code Generator</h1>
+        <div class="row">
+          <div class="input-field col s12">
+            <input type="text" id="input">
+            <label for="input">Enter text to encode:</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <button class="btn" onclick="generateQR()">Generate QR Code</button>
+            <button class="btn" onclick="clearQR()">Clear</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <div id="qrcode"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
