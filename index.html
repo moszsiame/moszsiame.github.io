@@ -98,7 +98,7 @@
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted the install prompt');
-                        document.cookie = "appInstalled=true; path=/";
+                        document.cookie = `appInstalled=true; path=/; ${expires}`;
                     } else {
                         console.log('User dismissed the install prompt');
                     }
@@ -124,11 +124,15 @@
             const totalPayments = parseInt(document.getElementById("totalPayments").value) || 0;
             const paidPayments = parseInt(document.getElementById("paidPayments").value) || 0;
             const amountPerPayment = parseFloat(document.getElementById("amountPerPayment").value) || 0;
-    
-            document.cookie = `carName=${carName}; path=/`;
-            document.cookie = `totalPayments=${totalPayments}; path=/`;
-            document.cookie = `paidPayments=${paidPayments}; path=/`;
-            document.cookie = `amountPerPayment=${amountPerPayment}; path=/`;
+
+            const expiryDate = new Date();
+            expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+            const expires = `expires=${expiryDate.toUTCString()}`;
+                
+            document.cookie = `carName=${carName}; path=/; ${expires}`;
+            document.cookie = `totalPayments=${totalPayments}; path=/; ${expires}`;
+            document.cookie = `paidPayments=${paidPayments}; path=/; ${expires}`;
+            document.cookie = `amountPerPayment=${amountPerPayment}; path=/; ${expires}`;
     
             loadSettings();
             var instance = M.Modal.getInstance(document.getElementById("settingsModal"));
