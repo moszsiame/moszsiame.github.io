@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slot Machine</title>
     <style>
         body {
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-family: "Noto Sans Thai Looped", serif;
+            font-weight: 400;
+            font-style: normal;
         }
         .slot-container {
             display: flex;
@@ -78,7 +84,8 @@
     </style>
 </head>
 <body>
-    <h1>Slot Machine ของแม้ ไม่มีคำว่า "ดวง"</h1>
+    <h1>Slot Machine</h1>
+    <h2>ของแท้ ไม่มีคำว่า "ดวง"</h2>
     <div class="slot-container">
         <div class="slot-box"><div class="slot" id="slot1">🍒</div></div>
         <div class="slot-box"><div class="slot" id="slot2">🍋</div></div>
@@ -89,7 +96,7 @@
     <label>ดวงดี กี่เปอร์เซ็น (%): <input type="number" id="winRate" value="30" min="0" max="100"></label>
     
     <script>
-        const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐"];
+        const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐" , "🎠", "💸", "🎃", "✨", "🍟", "🤙", "🍵", "🌸", "🍸"];
 
         function spin() {
             const winRate = parseInt(document.getElementById("winRate").value);
