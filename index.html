@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-        <button id="installBtn" class="btn waves-effect waves-light">ติดตั้งแอป</button>
+        <button id="installBtn" class="btn waves-effect waves-light" style="display: none;">ติดตั้งแอป</button>
         <div class="fab-container">
             <a class="btn-floating btn-large waves-effect waves-light red modal-trigger" href="#settingsModal">
                 <i class="material-icons">settings</i>
@@ -116,6 +116,14 @@
             // Check if the app is already installed
             if (document.cookie.includes('appInstalled=true')) {
                 document.getElementById('installBtn').style.display = 'none';
+            }
+
+            // Check if the app is already installed
+            const installButton = document.getElementById("installBtn");
+            if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+                //installButton.style.display = "none"; // ซ่อนปุ่ม Install
+            } else {
+                installButton.style.display = "block"; // แสดงปุ่ม Install
             }
         });
     
