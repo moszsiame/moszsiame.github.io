@@ -81,14 +81,7 @@
             e.preventDefault();
             // Stash the event so it can be triggered later.
             deferredPrompt = e;
-            // Check if the app is already installed
-            if (document.cookie.includes('appInstalled=true')) {
-                document.getElementById('installBtn').style.display = 'none';
-            } else {
-                // Update UI notify the user they can install the PWA
-                document.getElementById('installBtn').style.display = 'block';
-            }
-    
+            
             document.getElementById('installBtn').addEventListener('click', (e) => {
                 // Hide the app provided install promotion
                 document.getElementById('installBtn').style.display = 'none';
@@ -97,10 +90,10 @@
                 // Wait for the user to respond to the prompt
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        document.cookie = `appInstalled=true; path=/; ${expires}`;
+                        document.getElementById('installBtn').style.display = 'none';
                     } else {
-                        console.log('User dismissed the install prompt');
+                        // Update UI notify the user they can install the PWA
+                        document.getElementById('installBtn').style.display = 'block';
                     }
                     deferredPrompt = null;
                 });
@@ -112,12 +105,7 @@
             M.AutoInit(); // โหลด Materialize Components
             var elems = document.querySelectorAll('.modal');
             M.Modal.init(elems);
-    
-            // Check if the app is already installed
-            if (document.cookie.includes('appInstalled=true')) {
-                document.getElementById('installBtn').style.display = 'none';
-            }
-
+            
             // Check if the app is already installed
             const installButton = document.getElementById("installBtn");
             if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
