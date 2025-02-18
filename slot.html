@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .slot-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .slot-box {
+            border: 2px solid black;
+            margin: 5px;
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slot {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            transition: filter 0.2s ease-in-out;
+        }
+        .spinning {
+            animation: spin 0.2s infinite linear;
+            filter: blur(5px);
+        }
+        @keyframes spin {
+            0% { transform: rotateX(0deg); }
+            50% { transform: rotateX(180deg); }
+            100% { transform: rotateX(360deg); }
+        }
+        button {
+            font-size: 1.5em;
+            padding: 15px 30px;
+            margin-top: 20px;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #ff9900;
+            transform: scale(1.1);
+        }
+        button:active {
+            background-color: #cc7700;
+            transform: scale(1);
+        }
+        #result {
+            font-size: 2em;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .win-animation {
+            opacity: 1 !important;
+            transform: scale(1.2);
+            color: #ff0000;
+            animation: flash 0.5s infinite alternate;
+        }
+        @keyframes flash {
+            0% { color: #ff0000; }
+            100% { color: #ffff00; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Slot Machine ของแม้ ไม่มีคำว่า "ดวง"</h1>
+    <div class="slot-container">
+        <div class="slot-box"><div class="slot" id="slot1">🍒</div></div>
+        <div class="slot-box"><div class="slot" id="slot2">🍋</div></div>
+        <div class="slot-box"><div class="slot" id="slot3">🍊</div></div>
+    </div>
+    <button onclick="spin()">Spin</button>
+    <p id="result"></p>
+    <label>ดวงดี กี่เปอร์เซ็น (%): <input type="number" id="winRate" value="30" min="0" max="100"></label>
+    
+    <script>
+        const symbols = ["🍒", "🍋", "🍊", "🍉", "⭐"];
+
+        function spin() {
+            const winRate = parseInt(document.getElementById("winRate").value);
+            const isWin = Math.random() * 100 < winRate;
+            const slots = [
+                { element: document.getElementById("slot1"), delay: 1000 },
+                { element: document.getElementById("slot2"), delay: 1300 },
+                { element: document.getElementById("slot3"), delay: 1600 }
+            ];
+            
+            let selectedSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+            
+            slots.forEach(slot => {
+                slot.element.classList.add("spinning");
+            });
+
+            slots.forEach(slot => {
+                setTimeout(() => {
+                    slot.element.classList.remove("spinning");
+                    slot.element.textContent = isWin ? selectedSymbol : symbols[Math.floor(Math.random() * symbols.length)];
+                }, slot.delay);
+            });
+            
+            setTimeout(() => {
+                const resultElement = document.getElementById("result");
+                resultElement.textContent = isWin ? "You Win! 🎉" : "Try Again!";
+                resultElement.classList.remove("win-animation");
+                resultElement.style.opacity = "1";
+                resultElement.style.transform = "scale(1)";
+                if (isWin) {
+                    resultElement.classList.add("win-animation");
+                }
+            }, Math.max(...slots.map(slot => slot.delay)) + 100);
+        }
+    </script>
+</body>
+</html>
