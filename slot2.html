@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมสล็อต</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap');
+        body {
+            font-family: 'Noto Sans Thai', sans-serif;
+        }
+        .reel {
+            font-size: 4rem;
+            text-align: center;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            transition: all 0.1s ease-in-out; /* Adjusted transition speed */
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        /* Animation Keyframes for the spinning effect with blur */
+        @keyframes spinReel {
+            0% {
+                transform: rotateX(0deg);
+                filter: blur(0px);
+            }
+            50% {
+                transform: rotateX(180deg);
+                filter: blur(2px); /* Increased blur effect */
+            }
+            100% {
+                transform: rotateX(360deg);
+                filter: blur(0px);
+            }
+        }
+
+        /* Class to apply the spinning animation */
+        .spinning {
+            animation: spinReel 0.2s linear infinite; /* Increased animation speed */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-lg w-full">
+        <!-- Game Title -->
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">เกมสล็อต</h1>
+
+        <!-- Score and Bet Display -->
+        <div class="flex justify-between items-center mb-6 text-xl font-bold">
+            <div class="flex flex-col items-center">
+                <span class="text-gray-600 text-sm">ยอดคงเหลือ</span>
+                <span id="balance" class="text-green-600 text-2xl mt-1">100</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-gray-600 text-sm">เดิมพัน</span>
+                <span id="bet" class="text-red-600 text-2xl mt-1">10</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-gray-600 text-sm">เงินรางวัล</span>
+                <span id="winnings" class="text-yellow-600 text-2xl mt-1">0</span>
+            </div>
+        </div>
+
+        <!-- Reels Container -->
+        <div class="flex justify-around items-center space-x-2 bg-gray-200 p-4 rounded-xl shadow-inner mb-6">
+            <div id="reel1" class="reel rounded-xl w-1/3">🍒</div>
+            <div id="reel2" class="reel rounded-xl w-1/3">🍋</div>
+            <div id="reel3" class="reel rounded-xl w-1/3">🍇</div>
+        </div>
+        
+        <!-- Win Rate Control -->
+        <div class="flex flex-col items-center mb-6">
+            <label for="winRateSlider" class="text-gray-600 text-sm font-semibold mb-2">
+                ตั้งค่าอัตราการชนะ: <span id="winRateDisplay" class="text-blue-600">20</span>%
+            </label>
+            <input type="range" id="winRateSlider" min="0" max="100" value="20" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <!-- Result and Spin Button -->
+        <div class="text-center">
+            <p id="message" class="text-lg font-semibold text-gray-700 h-6 mb-4">กด 'หมุน' เพื่อเริ่ม!</p>
+            <button id="spinBtn" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl text-2xl shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 active:scale-95">หมุน</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get DOM elements
+            const balanceEl = document.getElementById('balance');
+            const betEl = document.getElementById('bet');
+            const winningsEl = document.getElementById('winnings');
+            const messageEl = document.getElementById('message');
+            const spinBtn = document.getElementById('spinBtn');
+            const reels = [
+                document.getElementById('reel1'),
+                document.getElementById('reel2'),
+                document.getElementById('reel3')
+            ];
+            const winRateSlider = document.getElementById('winRateSlider');
+            const winRateDisplay = document.getElementById('winRateDisplay');
+
+            // Define game state
+            let balance = 100;
+            const betAmount = 10;
+            const symbols = ['🍒', '�', '🍇', '🔔', '7️⃣'];
+            let spinning = false;
+            let winRate = parseInt(winRateSlider.value, 10);
+
+            // Update UI elements
+            function updateUI() {
+                balanceEl.textContent = balance;
+                betEl.textContent = betAmount;
+                winRateDisplay.textContent = winRate;
+            }
+
+            // Generate a random symbol for a single reel
+            function getRandomSymbol() {
+                return symbols[Math.floor(Math.random() * symbols.length)];
+            }
+
+            // A rigged function to generate the final result based on win rate
+            function getFinalResult() {
+                // Check if the spin should be a win
+                const isWinningSpin = Math.random() * 100 < winRate;
+                
+                if (isWinningSpin) {
+                    // Force a winning combination
+                    const winningSymbol = getRandomSymbol();
+                    return [winningSymbol, winningSymbol, winningSymbol];
+                } else {
+                    // Generate a non-winning combination
+                    let result = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+                    // Ensure it's not a three-of-a-kind winning combination
+                    while (result[0] === result[1] && result[1] === result[2]) {
+                        result = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
+                    }
+                    return result;
+                }
+            }
+
+            // Handle the spin button click
+            spinBtn.addEventListener('click', () => {
+                if (spinning || balance < betAmount) {
+                    messageEl.textContent = 'ยอดคงเหลือไม่พอ หรือกำลังหมุนอยู่!';
+                    return;
+                }
+
+                spinning = true;
+                balance -= betAmount;
+                winningsEl.textContent = 0;
+                messageEl.textContent = 'กำลังหมุน...';
+                updateUI();
+
+                // Apply spinning animation class
+                reels.forEach(reel => reel.classList.add('spinning'));
+
+                // Get the final result using the rigged function
+                const finalResult = getFinalResult();
+
+                // Stop the reels after a delay to show the animation
+                reels.forEach((reel, index) => {
+                    // Delay each reel stopping to create a cascade effect
+                    const stopDelay = (index + 1) * 500; // Adjusted speed
+                    setTimeout(() => {
+                        reel.classList.remove('spinning');
+                        reel.textContent = finalResult[index];
+                        // After the last reel stops, check for a win
+                        if (index === reels.length - 1) {
+                            spinning = false;
+                            checkWin(finalResult);
+                        }
+                    }, stopDelay);
+                });
+            });
+
+            // Check if the player won and update the balance
+            function checkWin(result) {
+                let prize = 0;
+                
+                // Check for three of a kind
+                if (result[0] === result[1] && result[1] === result[2]) {
+                    // Special jackpot prize for three 7s
+                    if (result[0] === '7️⃣') {
+                         prize = betAmount * 50;
+                         messageEl.textContent = `JACKPOT! ได้ 7 ทั้งหมด! รับรางวัล ${prize} บาท!`;
+                    } else {
+                         prize = betAmount * 10;
+                         messageEl.textContent = `ยินดีด้วย! ได้ ${result[0]} ทั้งหมด! ได้รับรางวัล ${prize} บาท!`;
+                    }
+                }
+                // Check for two of a kind (first two or last two)
+                else if (result[0] === result[1] || result[1] === result[2]) {
+                    prize = betAmount * 2;
+                    messageEl.textContent = `ได้สองอัน! ได้รับรางวัล ${prize} บาท!`;
+                }
+                // No win
+                else {
+                    messageEl.textContent = 'ลองอีกครั้งนะ!';
+                }
+                
+                // Add winnings to balance
+                balance += prize;
+                winningsEl.textContent = prize;
+                updateUI();
+            }
+
+            // Event listener for the win rate slider
+            winRateSlider.addEventListener('input', (e) => {
+                winRate = parseInt(e.target.value, 10);
+                updateUI();
+            });
+
+            // Initial UI update on page load
+            updateUI();
+        });
+    </script>
+
+</body>
+</html>
